@@ -1,5 +1,4 @@
-import { PrismaClient, user as PrismaUser } from "@prisma/client"
-
+import { user as PrismaUser } from "@prisma/client"
 import { 
     User,
     UserCreateArgs,
@@ -8,20 +7,23 @@ import {
     UserFindArgs,
     UserExistsArgs,
     UserExistsOutput,
+    UserAuthArgs,
 } from "../models/User"
-
 import prisma from "../prismaClient"
+
+const bcrypt = require('bcrypt');
 
 const UserService = {
     // create a user
     createUser: async (data: UserCreateArgs): Promise<User | null> => {  
         try {
+            const hashedPassword : string = await bcrypt.hash(data.password, 10);
             const created: PrismaUser = await prisma.user.create({
                 data: {
                     username: data.username,
                     email: data.email,
                     full_name: data.fullName,
-                    password: data.password,
+                    password: hashedPassword,
                     role: data.role,
                 },
             });
@@ -106,6 +108,24 @@ const UserService = {
         }
     },
 
+    authorizeUser: async (args : UserAuthArgs): Promise<User | null> => {
+        try {
+            const found: PrismaUser | null = await prisma.user.findUnique({
+                where: {
+                    username: args.username,
+                },
+            });
+            if (!found) {
+                return null;
+            }
+            const isPasswordCorrect: boolean = await bcrypt.compare(args.password, found.password);
+            return isPasswordCorrect ? UserService.mapPrismaUserToUser(found) : null;
+        } catch (error) {
+            console.error('Error authorizing user:', error);
+            return null;
+        }
+    },
+    
     // map Prisma user to User models
     mapPrismaUserToUser: (prismaUser : PrismaUser) : User => {
         return {
@@ -117,3 +137,5 @@ const UserService = {
         }
     }
 }
+
+export default UserService;

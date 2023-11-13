@@ -43,3 +43,8 @@ export type UserExistsArgs = {
 export type UserExistsOutput = {
     exists: boolean;
 }
+
+export type UserAuthArgs = {
+    username: string;
+    password: string;
+}
