@@ -52,6 +52,7 @@ model user {
   username        String            @id @db.VarChar(32)
   email           String?           @unique(map: "email") @db.VarChar(320)
   password        String            @db.VarChar(128)
+  full_name       String            @db.VarChar(128)
   role            user_role
   book_collection book_collection[]
   premium_book    premium_book[]
