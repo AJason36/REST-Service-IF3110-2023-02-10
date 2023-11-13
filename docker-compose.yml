@@ -3,6 +3,8 @@ services:
   db:
     image: mysql:latest
     container_name: rest_db
+    env_file:
+      - ./.env
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root}
       MYSQL_DATABASE: ${MYSQL_DATABASE:-rest_db}
