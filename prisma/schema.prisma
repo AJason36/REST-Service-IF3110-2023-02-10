@@ -1,0 +1,63 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model book_collection {
+  collection_id Int             @id @default(autoincrement())
+  created_by    String?         @db.VarChar(32)
+  name          String          @db.VarChar(255)
+  desc          String          @db.Text
+  created_at    DateTime        @db.Timestamp(0)
+  updated_at    DateTime?       @db.Timestamp(0)
+  user          user?           @relation(fields: [created_by], references: [username], onUpdate: NoAction, map: "book_collection_ibfk_1")
+  in_collection in_collection[]
+
+  @@index([created_by], map: "created_by")
+}
+
+model in_collection {
+  collection_id   Int
+  book_id         Int
+  book_collection book_collection @relation(fields: [collection_id], references: [collection_id], onDelete: Cascade, onUpdate: NoAction, map: "in_collection_ibfk_1")
+  premium_book    premium_book    @relation(fields: [book_id], references: [book_id], onDelete: Cascade, onUpdate: NoAction, map: "in_collection_ibfk_2")
+
+  @@id([collection_id, book_id])
+  @@index([book_id], map: "book_id")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model premium_book {
+  book_id       Int             @id
+  created_by    String?         @db.VarChar(32)
+  title         String          @db.VarChar(255)
+  genre         String          @db.VarChar(32)
+  year          Int             @db.Year
+  summary       String?         @db.Text
+  price         Int
+  duration      Int
+  languages     String?         @default("English") @db.VarChar(64)
+  audio_path    String          @db.Text
+  in_collection in_collection[]
+  user          user?           @relation(fields: [created_by], references: [username], onUpdate: NoAction, map: "premium_book_ibfk_1")
+
+  @@index([created_by], map: "created_by")
+}
+
+model user {
+  username        String            @id @db.VarChar(32)
+  email           String?           @unique(map: "email") @db.VarChar(320)
+  password        String            @db.VarChar(128)
+  role            user_role
+  book_collection book_collection[]
+  premium_book    premium_book[]
+}
+
+enum user_role {
+  author
+  curator
+}

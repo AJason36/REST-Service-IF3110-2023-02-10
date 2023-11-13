@@ -1,0 +1,13 @@
+version: '3.3'
+services:
+  db:
+    image: mysql:latest
+    container_name: rest_db
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-rest_db}
+    ports:
+      - '9907:3306'
+    volumes:
+      - ./db/mysql:/var/lib/mysql
+      - ./db:/docker-entrypoint-initdb.d
