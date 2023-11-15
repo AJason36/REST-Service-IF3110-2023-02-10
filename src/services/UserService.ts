@@ -10,6 +10,7 @@ import {
     UserAuthArgs,
 } from "../models/User"
 import prisma from "../prismaClient"
+import jwt from "jsonwebtoken";
 
 const bcrypt = require('bcrypt');
 
@@ -108,6 +109,26 @@ const UserService = {
         }
     },
 
+    // CheckPassword
+    authorizePass: async (args: UserAuthArgs): Promise<boolean> => { 
+        try {
+            const found: PrismaUser | null = await prisma.user.findUnique({
+                where: {
+                    username: args.username,
+                },
+            });
+            if (!found) {
+                return false;
+            }
+            const isPasswordCorrect: boolean = await bcrypt.compare(args.password, found.password);
+            return isPasswordCorrect;
+        } catch (error) {
+            console.error('Error check password:', error);
+            return false;
+        }
+    },
+
+    // Check Usrname
     authorizeUser: async (args : UserAuthArgs): Promise<User | null> => {
         try {
             const found: PrismaUser | null = await prisma.user.findUnique({
