@@ -10,6 +10,9 @@ import {
     UserExistsOutput,
 } from "../models/User"
 import { user_role } from "@prisma/client";
+import bcrypt from "bcrypt";
+
+const jwt = require("jsonwebtoken");
 
 // TODO: Move validation to middleware
 const validator = require('validator');
@@ -77,7 +80,7 @@ const UserController = {
             if (!user) {
                 return res.status(500).json({ error: "Unexpected error" });
             }
-            res.status(200).json({ user });
+            res.status(200).json({ status: user,msg: user.username +" Berhasil Registrasi" });
         } catch (error) {
             res.status(500).json({ error: "Internal server error" });
         }
@@ -90,14 +93,21 @@ const UserController = {
             if (!user) {
                 return res.status(404).json({ error: "User not found" });
             }
+            const match: boolean = await UserService.authorizePass({ username: username, password: password });
+            if (!match) {
+                return res.status(401).json({ error: "Wrong password" });
             
-
-
-            res.status(200).json({ status: "authorized", ...user });
+            }
+            
+            const accessToken = jwt.sign({ username: user.username, email:user.email, fullname:user.fullName, role:user.role}, process.env.ACCESS_TOKEN_SECRET, {
+                expiresIn: "7d",
+            });
+            res.status(200).json({ message:"Login successful. Logged in as "+user.username+" role: "+user.role, accessToken: accessToken });
         } catch (error) {
             res.status(500).json({ error: "Internal server error" });
         }
-    }
+    },
+ 
 }
 
 export default UserController;
