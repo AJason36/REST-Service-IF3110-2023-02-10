@@ -9,8 +9,7 @@ datasource db {
 
 model book_collection {
   collection_id Int             @id @default(autoincrement())
-  created_by    String?         @db.VarChar(32)
-  name          String          @db.VarChar(255)
+  created_by    String?         @db.VarChar(32) @unique
   desc          String          @db.Text
   created_at    DateTime        @db.Timestamp(0)
   updated_at    DateTime?       @db.Timestamp(0)
@@ -32,15 +31,13 @@ model in_collection {
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model premium_book {
-  book_id       Int             @id
+  book_id       Int             @id @default(autoincrement())
   created_by    String?         @db.VarChar(32)
   title         String          @db.VarChar(255)
   genre         String          @db.VarChar(32)
   year          Int             @db.Year
-  summary       String?         @db.Text
-  price         Int
+  content       String          @db.Text
   duration      Int
-  languages     String?         @default("English") @db.VarChar(64)
   audio_path    String          @db.Text
   in_collection in_collection[]
   user          user?           @relation(fields: [created_by], references: [username], onUpdate: NoAction, map: "premium_book_ibfk_1")
