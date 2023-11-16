@@ -61,6 +61,10 @@ const UserController = {
         console.log("Create User Request in at: " + new Date().toISOString() + " with body: " + JSON.stringify(req.body));
         const { username, email, fullName, password } = req.body;
         try {
+            if (!username || !email || !fullName || !password) {
+                return res.status(400).json({ error: "Missing required fields" });
+            }
+            
             if (!validator.isEmail(email)) {
                 return res.status(400).json({ error: "Invalid email format" });
             }
@@ -86,6 +90,39 @@ const UserController = {
         }
     },
 
+    createCurator: async (req: Request, res: Response) => {
+        console.log("Create Curator Request in at: " + new Date().toISOString() + " with body: " + JSON.stringify(req.body));
+        const { username, email, fullName, password } = req.body;
+        try {
+            if (!username || !email || !fullName || !password) {
+                return res.status(400).json({ error: "Missing required fields" });
+            }
+            
+            if (!validator.isEmail(email)) {
+                return res.status(400).json({ error: "Invalid email format" });
+            }
+
+            const userExist = await UserService.userExists({ username: username });
+            if (userExist.exists) {
+                return res.status(400).json({ error: "Username already exists" });
+            }
+
+            const emailExist = await UserService.userExists({ email: email });
+            if (emailExist.exists) {
+                return res.status(400).json({ error: "Email already exists" });
+            }
+
+            const args : UserCreateArgs = { username, email, fullName, password, role: user_role.curator };
+            const user: User | null = await UserService.createCurator(args);
+            if (!user) {
+                return res.status(500).json({ error: "Unexpected error" });
+            }
+            res.status(200).json({ status: user,msg: user.username +" Berhasil Registrasi" });
+        } catch (error) {
+            res.status(500).json({ error: "Internal server error" });
+        }
+    },
+    
     authorizeUser: async (req: Request, res: Response) => {
         const { username, password } = req.body;
         try {
@@ -96,13 +133,12 @@ const UserController = {
             const match: boolean = await UserService.authorizePass({ username: username, password: password });
             if (!match) {
                 return res.status(401).json({ error: "Wrong password" });
-            
             }
             
-            const accessToken = jwt.sign({ username: user.username, email:user.email, fullname:user.fullName, role:user.role}, process.env.ACCESS_TOKEN_SECRET, {
+            const accessToken:string = jwt.sign({ username: user.username, email:user.email, fullname:user.fullName, role:user.role}, process.env.ACCESS_TOKEN_SECRET, {
                 expiresIn: "7d",
             });
-            res.status(200).json({ message:"Login successful. Logged in as "+user.username+" role: "+user.role, accessToken: accessToken });
+            res.status(200).json({ message:"Logged in as "+user.username+" role: "+user.role, accessToken: accessToken });
         } catch (error) {
             res.status(500).json({ error: "Internal server error" });
         }
