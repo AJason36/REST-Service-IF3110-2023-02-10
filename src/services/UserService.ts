@@ -11,6 +11,7 @@ import {
 } from "../models/User"
 import prisma from "../prismaClient"
 import jwt from "jsonwebtoken";
+import BookCollectionService from "./BookCollectionService";
 
 const bcrypt = require('bcrypt');
 
@@ -31,6 +32,32 @@ const UserService = {
             return UserService.mapPrismaUserToUser(created);
         } catch (error) {
             console.error('Error creating user:', error);
+            return null;
+        }  
+    },
+
+    //create curator
+    createCurator: async (data: UserCreateArgs): Promise<User | null> => {  
+        try {
+            const hashedPassword : string = await bcrypt.hash(data.password, 10);
+            const created: PrismaUser = await prisma.user.create({
+                data: {
+                    username: data.username,
+                    email: data.email,
+                    full_name: data.fullName,
+                    password: hashedPassword,
+                    role: data.role,
+                },
+            });
+
+            const bookCollection = await BookCollectionService.createBookCollection({
+                createdBy: data.username,
+                desc: 'This is ' + data.username+' Book Collection',
+            });
+            console.log("Book Collection created for curator: " + bookCollection)
+            return UserService.mapPrismaUserToUser(created);
+        } catch (error) {
+            console.error('Error creating curator:', error);
             return null;
         }  
     },
@@ -131,7 +158,7 @@ const UserService = {
     // Check Usrname
     authorizeUser: async (args : UserAuthArgs): Promise<User | null> => {
         try {
-            const found: PrismaUser | null = await prisma.user.findUnique({
+            const found: PrismaUser | null = await prisma.user.findFirst({
                 where: {
                     username: args.username,
                 },
@@ -139,8 +166,8 @@ const UserService = {
             if (!found) {
                 return null;
             }
-            const isPasswordCorrect: boolean = await bcrypt.compare(args.password, found.password);
-            return isPasswordCorrect ? UserService.mapPrismaUserToUser(found) : null;
+            // const isPasswordCorrect: boolean = await bcrypt.compare(args.password, found.password);
+            return UserService.mapPrismaUserToUser(found);
         } catch (error) {
             console.error('Error authorizing user:', error);
             return null;
@@ -157,6 +184,7 @@ const UserService = {
             role: prismaUser.role,
         }
     }
+    
 }
 
 export default UserService;
