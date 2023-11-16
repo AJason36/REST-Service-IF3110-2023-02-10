@@ -1,5 +1,6 @@
 import { Router } from "express";
 import userRoutes from "./userRoutes";
+import requestRoutes from './requestRoutes';
 import UserController from "../controllers/UserController"
 import PremiumBookController from "../controllers/PremiumBookController";
 import BookCollectionController from "../controllers/BookCollectionController";
@@ -30,6 +31,9 @@ router.post('/collection', BookCollectionController.createBookCollection);
 router.put('/collection/:collectionId', BookCollectionController.updateBookCollection);
 router.delete('/collection/:bookId', BookCollectionController.deleteBookFromCollection);
 router.post('/collection/:bookId', BookCollectionController.addBookToCollection);
+
+// request (soap) routes
+router.use('/request', requestRoutes);
 
 
 export default router;
