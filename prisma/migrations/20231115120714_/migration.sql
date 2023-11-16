@@ -2,7 +2,6 @@
 CREATE TABLE `book_collection` (
     `collection_id` INTEGER NOT NULL AUTO_INCREMENT,
     `created_by` VARCHAR(32) NULL,
-    `name` VARCHAR(255) NOT NULL,
     `desc` TEXT NOT NULL,
     `created_at` TIMESTAMP(0) NOT NULL,
     `updated_at` TIMESTAMP(0) NULL,
@@ -22,15 +21,13 @@ CREATE TABLE `in_collection` (
 
 -- CreateTable
 CREATE TABLE `premium_book` (
-    `book_id` INTEGER NOT NULL,
+    `book_id` INTEGER NOT NULL AUTO_INCREMENT,
     `created_by` VARCHAR(32) NULL,
     `title` VARCHAR(255) NOT NULL,
     `genre` VARCHAR(32) NOT NULL,
     `year` YEAR NOT NULL,
-    `summary` TEXT NULL,
-    `price` INTEGER NOT NULL,
+    `content` TEXT NOT NULL,
     `duration` INTEGER NOT NULL,
-    `languages` VARCHAR(64) NULL DEFAULT 'English',
     `audio_path` TEXT NOT NULL,
 
     INDEX `created_by`(`created_by`),
@@ -42,6 +39,7 @@ CREATE TABLE `user` (
     `username` VARCHAR(32) NOT NULL,
     `email` VARCHAR(320) NULL,
     `password` VARCHAR(128) NOT NULL,
+    `full_name` VARCHAR(128) NOT NULL,
     `role` ENUM('author', 'curator') NOT NULL,
 
     UNIQUE INDEX `email`(`email`),
