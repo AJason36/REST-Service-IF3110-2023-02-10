@@ -1,4 +1,4 @@
-version: '3.3'
+version: "3.3"
 services:
   db:
     image: mysql:latest
@@ -6,7 +6,4 @@ services:
     env_file:
       - .env
     ports:
-      - '9907:3306'
-    volumes:
-      - ./db/mysql:/var/lib/mysql
-      - ./db:/docker-entrypoint-initdb.d
+      - "9907:3306"
