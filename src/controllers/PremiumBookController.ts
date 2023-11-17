@@ -55,13 +55,14 @@ const PremiumBookController = {
         }
     },
 
-    createPremiumBook: async (req: Request, res: Response) => {
+    createPremiumBook: async (req: Request<PremiumBook>, res: Response) => {
         const user = await prisma.user.findUnique({
             where: {
                 username: res.locals.user.username,
             },
         });
-
+        const book: PremiumBook = req.body;
+        console.log(req.body)
         const { title, genre, year, content, duration, audioPath } = req.body;
         // console.log(req.body);
         try {

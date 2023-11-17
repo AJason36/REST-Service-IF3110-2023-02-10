@@ -65,6 +65,18 @@ const BookCollectionController = {
             res.status(500).json({ message: "Failed" });
         }
     },
+    getBookInCollectionPhp: async (req: Request, res: Response) => { 
+        try {
+            const collectionId = parseInt(req.params.collectionId);
+            const books = await ModifyCollectionService.getBooksInCollection(collectionId);
+            if (!books) {
+                return res.status(404).json({ message: `Book collection by ${collectionId} not found` });
+            }
+            res.status(200).json({ books });
+        } catch (error) {
+            res.status(500).json({ message: "Failed" });
+        }
+    },
 
     getBookCollectionById: async (req: Request, res: Response) => {
         // const collectionId = parseInt(req.params.collectionId);
