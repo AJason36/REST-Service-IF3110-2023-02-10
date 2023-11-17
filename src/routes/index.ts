@@ -1,9 +1,12 @@
 import { Router } from "express";
 import userRoutes from "./userRoutes";
+import requestRoutes from './requestRoutes';
 import UserController from "../controllers/UserController"
 import PremiumBookController from "../controllers/PremiumBookController";
 import BookCollectionController from "../controllers/BookCollectionController";
 import { authenticateAuthor,authenticateCurator,authenticateUser } from "../middlewares/auth";
+import multer from 'multer';
+const upload = multer({ dest: 'uploads/' });
 
 const router : Router = Router();
 
@@ -30,6 +33,13 @@ router.post('/collection', BookCollectionController.createBookCollection);
 router.put('/collection/:collectionId', BookCollectionController.updateBookCollection);
 router.delete('/collection/:bookId', BookCollectionController.deleteBookFromCollection);
 router.post('/collection/:bookId', BookCollectionController.addBookToCollection);
+
+router.get('/collection-premium', PremiumBookController.getAllPremiumBooks);
+router.get('/curator-collection', BookCollectionController.getAllCollections);
+router.get('/curator-collection/:collectionId', BookCollectionController.getBookInCollectionPhp);
+router.get('/book-collection/:bookId', PremiumBookController.getPremiumBookById);
+// request (soap) routes
+router.use('/request', requestRoutes);
 
 
 export default router;
