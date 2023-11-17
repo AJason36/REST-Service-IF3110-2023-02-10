@@ -55,7 +55,7 @@ const ModifyCollectionService = {
         }
     },
 
-    async getBooksInCollection(collectionId: number): Promise<{collection_id: number, book_id: number, title:string, author:string|null}[]> {
+    async getBooksInCollection(collectionId: number): Promise<{collection_id: number, curator:string, book_id: number, title:string, author:string|null}[]> {
         const booksInCollection = await prisma.in_collection.findMany({
             include: {
                 premium_book: true,    
@@ -64,15 +64,27 @@ const ModifyCollectionService = {
                 collection_id: collectionId,
             },
         });
-      
+
+        const curator = await ModifyCollectionService.getCurator(collectionId);
+
         return booksInCollection.map((book) => {
             return {
+                curator: curator,
                 collection_id: book.collection_id,
                 book_id: book.premium_book.book_id,
                 title: book.premium_book?.title,
                 author: book.premium_book?.created_by,
             };
         });
+    },
+
+    async getCurator(collectionId: number): Promise<string> { 
+        const collection = await prisma.book_collection.findUnique({
+            where: {
+                collection_id: collectionId,
+            },
+        });
+        return collection?.created_by ?? '';
     },
     async isBookExistInCollection(collectionId: number, bookId: number): Promise<boolean> { 
         try {
