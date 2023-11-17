@@ -57,6 +57,20 @@ const BookCollectionService = {
         }
     },
 
+    findCollectionIdByUsername: async (username: string): Promise<number | null> => {
+        try {
+            const found: PrismaCollection | null = await prisma.book_collection.findFirst({
+                where: {
+                    created_by: username
+                }
+            })
+            return found ? found.collection_id : null;
+        } catch (error) {
+            console.error('Error finding book collection:', error);
+            return null;
+        }
+    },
+
     //find all collection
     findAllCollection: async (): Promise<BookCollection[]> => {
         try {

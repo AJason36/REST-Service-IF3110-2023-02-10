@@ -37,6 +37,7 @@ router.get('/collection-premium', PremiumBookController.getAllPremiumBooks);
 router.get('/curator-collection', BookCollectionController.getAllCollections);
 router.get('/curator-collection/:collectionId', BookCollectionController.getBookInCollectionPhp);
 router.get('/book-collection/:bookId', PremiumBookController.getPremiumBookById);
+router.get('/curator/:username', BookCollectionController.getCollectionIdByUsername);
 router.use('/request', requestRoutes);
 
 // request (soap) routes

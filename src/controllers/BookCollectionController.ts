@@ -78,6 +78,18 @@ const BookCollectionController = {
         }
     },
 
+    getCollectionIdByUsername: async (req: Request, res: Response) => { 
+        const createdBy = req.params.username;
+        try {
+            const collectionId: number | null = await BookCollectionService.findCollectionIdByUsername(createdBy);
+            if (!collectionId) {
+                return res.status(404).json({ message: `Book collection by ${createdBy} not found` });
+            }
+            res.status(200).json({ collectionId });
+        } catch (error) {
+            res.status(500).json({ message: "Failed" });
+        }
+    },
     getBookCollectionById: async (req: Request, res: Response) => {
         // const collectionId = parseInt(req.params.collectionId);
         const createdBy = res.locals.user.username;
