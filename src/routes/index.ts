@@ -26,7 +26,6 @@ router.get('/premium-book', PremiumBookController.getPremiumBookByAuthor);
 
 //curator routes
 router.use('/collection', authenticateCurator)
-// router.get('/collection', BookCollectionController.getAllCollections);
 router.get('/collection', BookCollectionController.getBookInCollection);
 router.get('/collection/premium', PremiumBookController.getAllPremiumBooks);
 router.post('/collection', BookCollectionController.createBookCollection);
@@ -38,8 +37,9 @@ router.get('/collection-premium', PremiumBookController.getAllPremiumBooks);
 router.get('/curator-collection', BookCollectionController.getAllCollections);
 router.get('/curator-collection/:collectionId', BookCollectionController.getBookInCollectionPhp);
 router.get('/book-collection/:bookId', PremiumBookController.getPremiumBookById);
-// request (soap) routes
 router.use('/request', requestRoutes);
 
+// request (soap) routes
+// router.get('/collection', BookCollectionController.getAllCollections);
 
 export default router;
